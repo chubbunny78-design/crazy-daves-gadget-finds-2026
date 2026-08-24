@@ -1,6 +1,7 @@
 import React from 'react';
-import { Star, Check, ExternalLink, Bell, Layers, Tag, ArrowRight } from 'lucide-react';
+import { Star, Check, ExternalLink, Bell, Layers, Tag } from 'lucide-react';
 import { Product } from '../types';
+import { getAmazonAffiliateUrl } from '../utils/affiliateHelper';
 
 interface ProductCardProps {
   key?: React.Key;
@@ -25,6 +26,8 @@ export function ProductCard({
   const lowestStore = availableStores.length > 0
     ? availableStores.reduce((prev, curr) => curr.price < prev.price ? curr : prev, availableStores[0])
     : product.stores[0];
+
+  const amazonUrl = getAmazonAffiliateUrl(product);
 
   const savings = product.originalPrice > product.price 
     ? Math.round(product.originalPrice - product.price)
@@ -167,13 +170,16 @@ export function ProductCard({
           >
             Review Specs
           </button>
-          <button
-            onClick={() => onOutboundClick(product, lowestStore.storeName)}
+          <a
+            href={amazonUrl}
+            target="_blank"
+            rel="sponsored noopener noreferrer"
+            onClick={() => onOutboundClick(product, 'Amazon')}
             className="px-3 py-2 rounded-lg text-xs font-bold bg-white text-black hover:bg-slate-200 transition-colors flex items-center justify-center gap-1.5 shadow-sm text-center truncate"
           >
             <span>Get Deal</span>
             <ExternalLink className="w-3 h-3 shrink-0" />
-          </button>
+          </a>
         </div>
 
         {/* Coupon alert if present */}

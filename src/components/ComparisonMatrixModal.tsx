@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Check, Star, ExternalLink, ArrowRight, Layers, Trash2 } from 'lucide-react';
 import { Product } from '../types';
+import { getAmazonAffiliateUrl } from '../utils/affiliateHelper';
 
 interface ComparisonMatrixModalProps {
   pinnedProducts: Product[];
@@ -119,13 +120,16 @@ export function ComparisonMatrixModal({
                         <span className="text-base font-medium font-mono text-indigo-400">
                           ${p.price.toFixed(2)}
                         </span>
-                        <button
-                          onClick={() => onOutboundClick(p, p.stores[0]?.storeName || 'Amazon')}
+                        <a
+                          href={getAmazonAffiliateUrl(p)}
+                          target="_blank"
+                          rel="sponsored noopener noreferrer"
+                          onClick={() => onOutboundClick(p, 'Amazon')}
                           className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-black hover:bg-slate-200 transition-colors flex items-center gap-1 shadow-sm"
                         >
                           <span>Get Deal</span>
                           <ExternalLink className="w-3 h-3" />
-                        </button>
+                        </a>
                       </div>
                     </div>
                   </th>

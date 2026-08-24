@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Star, Check, AlertCircle, ExternalLink, Bell, Tag, ArrowRight, ShieldCheck, Code, Copy, CheckCircle2, TrendingDown } from 'lucide-react';
 import { Product } from '../types';
+import { buildAffiliateUrl, getAmazonAffiliateUrl } from '../utils/affiliateHelper';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -239,20 +240,29 @@ export function ProductDetailModal({
                           <span className="text-base sm:text-lg font-mono font-medium text-indigo-400 tabular-nums">
                             ${store.price.toFixed(2)}
                           </span>
-                          <button
-                            onClick={() => onOutboundClick(product, store.storeName)}
-                            disabled={!store.inStock}
-                            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm shrink-0 ${
-                              store.inStock
-                                ? isLowest
+                          {store.inStock ? (
+                            <a
+                              href={buildAffiliateUrl(product, store.storeName)}
+                              target="_blank"
+                              rel="sponsored noopener noreferrer"
+                              onClick={() => onOutboundClick(product, store.storeName)}
+                              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm shrink-0 ${
+                                isLowest
                                   ? 'bg-white text-black hover:bg-slate-200'
                                   : 'bg-white/5 border border-white/10 text-white hover:bg-white/10'
-                                : 'bg-white/5 text-slate-500 cursor-not-allowed border border-white/5'
-                            }`}
-                          >
-                            <span>View Store</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </button>
+                              }`}
+                            >
+                              <span>{store.storeName === 'Amazon' ? 'Buy on Amazon' : 'View Store'}</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          ) : (
+                            <button
+                              disabled
+                              className="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm shrink-0 bg-white/5 text-slate-500 cursor-not-allowed border border-white/5"
+                            >
+                              <span>Out of Stock</span>
+                            </button>
+                          )}
                         </div>
                       </div>
                     );

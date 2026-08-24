@@ -21,6 +21,7 @@ import {
 } from './data/seedData';
 import { Product, Article, AutopilotLog, AffiliateSettings, PriceAlert, ClickRecord } from './types';
 import { Sparkles, CheckCircle2, ArrowRight, Layers, Bell, ExternalLink, ShieldCheck, Heart } from 'lucide-react';
+import { buildAffiliateUrl } from './utils/affiliateHelper';
 
 export default function App() {
   // --- Persistent State ---
@@ -29,10 +30,17 @@ export default function App() {
     if (!saved) return INITIAL_PRODUCTS;
     try {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length < INITIAL_PRODUCTS.length) {
-        return INITIAL_PRODUCTS;
+      if (Array.isArray(parsed) && parsed.length >= INITIAL_PRODUCTS.length) {
+        // Ensure all stores have direct external affiliate URLs synced
+        return parsed.map((p: Product) => {
+          const fresh = INITIAL_PRODUCTS.find(fp => fp.id === p.id);
+          if (fresh) {
+            return { ...p, stores: fresh.stores };
+          }
+          return p;
+        });
       }
-      return parsed;
+      return INITIAL_PRODUCTS;
     } catch {
       return INITIAL_PRODUCTS;
     }
@@ -115,6 +123,21 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('affilipulse_clicks', JSON.stringify(clickRecords));
   }, [clickRecords]);
+
+  // Auto-resolve any legacy /go/... links if accessed directly on static hosts (Netlify/Vercel/Cloudflare)
+  useEffect(() => {
+    const pathname = window.location.pathname;
+    if (pathname.startsWith('/go/')) {
+      const parts = pathname.replace('/go/', '').split('/');
+      const productId = parts[0];
+      const storeName = parts[1] || 'amazon';
+      const matched = products.find(p => p.id === productId);
+      if (matched) {
+        const dest = buildAffiliateUrl(matched, storeName, settings);
+        window.location.replace(dest);
+      }
+    }
+  }, [products, settings]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -299,7 +322,7 @@ export default function App() {
     }
   };
 
-  // --- Outbound Link Redirection Simulator ---
+  // --- Outbound Link Redirection Handler ---
   const handleOutboundClick = (product: Product, storeName: string) => {
     // Record telemetry
     const comm = Number((product.price * 0.045).toFixed(2));
@@ -319,9 +342,9 @@ export default function App() {
     const activeTag = settings.amazonAssociateId || 'crazdaveaipic-20';
     showToast(`Redirecting to ${storeName}... Applied affiliate partner tag [${activeTag}] (+~$${comm} est. commission)`);
     
-    // Open cloaked URL with tag and query
-    const targetUrl = `/go/${product.id}/${encodeURIComponent(storeName.toLowerCase())}?tag=${encodeURIComponent(activeTag)}&q=${encodeURIComponent(product.title)}`;
-    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    // Direct destination affiliate URL (compatible with Netlify, Vercel, static CDN, and server deployments)
+    const directUrl = buildAffiliateUrl(product, storeName, settings);
+    window.open(directUrl, '_blank', 'noopener,noreferrer');
   };
 
   // --- Comparison & Pin Handlers ---

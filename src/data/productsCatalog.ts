@@ -6,6 +6,7 @@ const createStores = (asinOrQuery: string, basePrice: number, amazonCode?: strin
     storeName: 'Amazon', 
     price: basePrice, 
     inStock: true, 
+    url: `https://www.amazon.com/s?k=${encodeURIComponent(asinOrQuery)}&tag=crazdaveaipic-20`,
     affiliateSuffix: '&tag=crazdaveaipic-20',
     couponCode: amazonCode 
   },
@@ -13,12 +14,14 @@ const createStores = (asinOrQuery: string, basePrice: number, amazonCode?: strin
     storeName: 'Best Buy', 
     price: Number((basePrice * 1.03).toFixed(2)), 
     inStock: true, 
+    url: `https://www.bestbuy.com/site/searchpage.jsp?st=${encodeURIComponent(asinOrQuery)}`,
     affiliateSuffix: '&siteID=affilipulse' 
   },
   { 
     storeName: 'B&H Photo', 
     price: basePrice, 
     inStock: true, 
+    url: `https://www.bhphotovideo.com/c/search?Ntt=${encodeURIComponent(asinOrQuery)}`,
     affiliateSuffix: '&kw=affilipulse' 
   }
 ];
