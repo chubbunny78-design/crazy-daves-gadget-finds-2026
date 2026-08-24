@@ -1,0 +1,6 @@
+{
+  "name": "AffiliPulse AI - Autonomous Affiliate Commerce & SEO Engine",
+  "description": "Autonomous AI-powered affiliate storefront featuring automated product discovery, live price comparisons, SEO-optimized reviews, auto-pilot crawl scheduler, and rich schema markup.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
